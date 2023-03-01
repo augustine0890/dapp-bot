@@ -5,7 +5,10 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
+	"github.com/augustine0890/dapp-bot/internal/database"
+	"github.com/augustine0890/dapp-bot/pkg/config"
 	"github.com/bwmarrin/discordgo"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -19,9 +22,15 @@ type Discord struct {
 }
 
 // NewDiscord creates a new Discord instance for the bot
-func NewDiscord(token string, mongoClient *mongo.Client) (*Discord, error) {
+func NewDiscord(cfg *config.Config) (*Discord, error) {
+	// Connect to MongoDB
+	mongoClient, err := database.GetMongoClient(cfg.MongoURI, cfg.MongoDBName, 10*time.Second)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to create MongoDB client: %w", err)
+	}
+
 	// Create a new Discord session
-	session, err := discordgo.New("Bot " + token)
+	session, err := discordgo.New("Bot " + cfg.DiscordToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Discord session: %w", err)
 	}
