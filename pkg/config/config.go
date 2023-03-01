@@ -7,6 +7,7 @@ import (
 // Config represents the application's configuration.
 type Config struct {
 	MongoURI     string `mapstructure:"mongo_uri"`
+	MongoDBName  string `mapstructure:"mongo_db_name"`
 	DiscordToken string `mapstructure:"discord_token"`
 }
 
