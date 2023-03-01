@@ -52,6 +52,8 @@ func NewDiscord(cfg *config.Config) (*Discord, error) {
 		reactionCh:    make(chan *discordgo.MessageReactionAdd),
 	}
 
+	// Register the ready command handler function
+	session.AddHandler(HandleReady)
 	// Register the message reaction handler function
 	// session.AddHandler(d.HandleReaction)
 
