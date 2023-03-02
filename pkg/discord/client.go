@@ -40,6 +40,7 @@ func NewDiscord(cfg *config.Config) (*Discord, error) {
 	ch.RegisterCommand(HandlePing, "ping")
 	ch.RegisterCommand(HandlePlayDapp, "dapp")
 	ch.RegisterCommand(CheckPointCommand(cfg, mongoClient), "cp", "checkpoint")
+	ch.RegisterCommand(RankCommand(cfg, mongoClient), "r", "rank")
 
 	// Register the command handler function
 	session.AddHandler(ch.HandleCommand)
@@ -53,7 +54,7 @@ func NewDiscord(cfg *config.Config) (*Discord, error) {
 	}
 
 	// Register the ready command handler function
-	session.AddHandler(HandleReady)
+	// session.AddHandler(HandleReady)
 	// Register the message reaction handler function
 	// session.AddHandler(d.HandleReaction)
 
