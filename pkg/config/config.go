@@ -10,6 +10,7 @@ type Config struct {
 	MongoDBName  string `mapstructure:"mongo_db_name"`
 	DiscordToken string `mapstructure:"discord_token"`
 	GuildID      string `mapstructure:"guild_id"`
+	AttendanceID string `mapstructure:"attendance_id"`
 }
 
 // LoadConfig loads the application's configuration from the config file.

@@ -37,9 +37,9 @@ func NewDiscord(cfg *config.Config) (*Discord, error) {
 
 	// Create a new CommandHandler and register commands
 	ch := NewCommandHandler()
-	ch.RegisterCommand("ping", HandlePing)
-	ch.RegisterCommand("dapp", HandlePlayDapp)
-	ch.RegisterCommand("rank", HandleRank)
+	ch.RegisterCommand(HandlePing, "ping")
+	ch.RegisterCommand(HandlePlayDapp, "dapp")
+	ch.RegisterCommand(CheckPointCommand(cfg, mongoClient), "cp", "checkpoint")
 
 	// Register the command handler function
 	session.AddHandler(ch.HandleCommand)

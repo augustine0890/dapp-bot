@@ -22,9 +22,11 @@ func NewCommandHandler() *CommandHandler {
 	}
 }
 
-// RegisterCommand registers a command with the CommandHandler
-func (ch *CommandHandler) RegisterCommand(name string, handler CommandHandlerFunc) {
-	ch.commands[name] = handler
+// RegisterCommand registers one or more commands with the CommandHandler
+func (ch *CommandHandler) RegisterCommand(handler CommandHandlerFunc, names ...string) {
+	for _, name := range names {
+		ch.commands[name] = handler
+	}
 }
 
 // HandleCommand handles incoming messages and triggers the corresponding command handlers
@@ -113,15 +115,5 @@ func HandlePlayDapp(s *discordgo.Session, m *discordgo.MessageCreate, args []str
 	_, err := s.ChannelMessageSend(m.ChannelID, "Let's play DappBot!")
 	if err != nil {
 		fmt.Println("Error handling !dapp command:", err)
-	}
-}
-
-// HandleRank handles the !rank command and sends the user's rank card as a message
-func HandleRank(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
-	// TODO: Implement rank card generation logic
-	// Send the generated rank card as a message
-	_, err := s.ChannelMessageSend(m.ChannelID, "Your rank card:")
-	if err != nil {
-		fmt.Println("Error handling !rank command:", err)
 	}
 }

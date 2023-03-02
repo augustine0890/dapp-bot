@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/augustine0890/dapp-bot/pkg/config"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -32,4 +33,9 @@ func GetMongoClient(uri string, dbName string, timeout time.Duration) (*mongo.Cl
 	fmt.Println("Connected to MongoDB")
 
 	return client, nil
+}
+
+// GetUsersColl returns the MongoDB collection of users
+func GetUsersColl(mongoClient *mongo.Client, cfg *config.Config) *mongo.Collection {
+	return mongoClient.Database(cfg.MongoDBName).Collection("users")
 }
