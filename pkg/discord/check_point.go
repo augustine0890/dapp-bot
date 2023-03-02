@@ -10,8 +10,8 @@ import (
 
 	"github.com/augustine0890/dapp-bot/internal/database"
 	"github.com/augustine0890/dapp-bot/pkg/config"
+	"github.com/augustine0890/dapp-bot/pkg/logging"
 	"github.com/bwmarrin/discordgo"
-	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -43,7 +43,7 @@ func handleCheckPoint(s *discordgo.Session, m *discordgo.MessageCreate, args []s
 		message := fmt.Sprintf("<@%s> Please go to the <#%s> channel for Daily Attendance and Points Checking.", m.Author.ID, attendanceChannelID)
 		_, err := s.ChannelMessageSend(m.ChannelID, message)
 		if err != nil {
-			log.Error().Msgf("Error sending message: %v", err)
+			logging.Error("Error sending message", err)
 		}
 		return
 	}
@@ -53,7 +53,7 @@ func handleCheckPoint(s *discordgo.Session, m *discordgo.MessageCreate, args []s
 	var user database.User
 	err := usersColl.FindOne(ctx, filter).Decode(&user)
 	if err != nil {
-		log.Error().Msgf("Error retrieving user points:", err)
+		logging.Error("Failed retrieving user points", err)
 		return
 	}
 
@@ -98,8 +98,8 @@ func handleRank(s *discordgo.Session, m *discordgo.MessageCreate, args []string,
 	findOptions.SetLimit(10)
 	cursor, err := usersColl.Find(ctx, bson.M{}, findOptions)
 	if err != nil {
-		msg := fmt.Sprintf("Error fetching user data from the database. %v", err)
-		log.Error().Msg(msg)
+		msg := "Error fetching user data from the database"
+		logging.Error(msg, err)
 		return
 	}
 	defer cursor.Close(ctx)
@@ -114,7 +114,7 @@ func handleRank(s *discordgo.Session, m *discordgo.MessageCreate, args []string,
 		var rankUser database.User
 		err := cursor.Decode(&rankUser)
 		if err != nil {
-			log.Error().Msgf("Failed to get rank. %v\n", err)
+			logging.Error("Failed to get rank.", err)
 			return
 		}
 
@@ -127,21 +127,21 @@ func handleRank(s *discordgo.Session, m *discordgo.MessageCreate, args []string,
 	}
 
 	if err := cursor.Err(); err != nil {
-		log.Error().Msgf("Failed to get rank. %v\n", err)
+		logging.Error("Failed to get rank.", err)
 		return
 	}
 
 	// Open the image file
 	imageFile, err := os.Open("./assets/images/winners.jpg")
 	if err != nil {
-		log.Error().Msgf("Failed to open image file: %v\n", err)
+		logging.Error("Failed to open image file:", err)
 		return
 	}
 	defer imageFile.Close()
 	// Get the file info
 	fileInfo, err := imageFile.Stat()
 	if err != nil {
-		log.Error().Msgf("Failed to get image file info: %v\n", err)
+		logging.Error("Failed to get image file info:", err)
 		return
 	}
 
@@ -149,7 +149,7 @@ func handleRank(s *discordgo.Session, m *discordgo.MessageCreate, args []string,
 	imageData := make([]byte, fileInfo.Size())
 	_, err = imageFile.Read(imageData)
 	if err != nil {
-		log.Error().Msgf("Failed to read image file: %v\n", err)
+		logging.Error("Failed to read image file:", err)
 		return
 	}
 	// Create a new discordgo file from the byte slice
@@ -178,7 +178,7 @@ func handleRank(s *discordgo.Session, m *discordgo.MessageCreate, args []string,
 		Files: []*discordgo.File{image},
 	})
 	if err != nil {
-		log.Error().Msgf("Error sending message to channel. %v\n", err)
+		logging.Error("Error sending message to channel.", err)
 		return
 	}
 }

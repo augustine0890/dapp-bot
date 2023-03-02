@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/augustine0890/dapp-bot/pkg/config"
-	"github.com/rs/zerolog/log"
+	"github.com/augustine0890/dapp-bot/pkg/logging"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -31,7 +31,7 @@ func GetMongoClient(uri string, dbName string, timeout time.Duration) (*mongo.Cl
 		return nil, fmt.Errorf("failed to ping MongoDB: %w", err)
 	}
 
-	log.Info().Msg("Connected to MongoDB")
+	logging.Info("Connected to MongoDB")
 
 	return client, nil
 }
