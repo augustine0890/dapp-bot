@@ -40,3 +40,8 @@ func GetMongoClient(uri string, dbName string, timeout time.Duration) (*mongo.Cl
 func GetUsersColl(mongoClient *mongo.Client, cfg *config.Config) *mongo.Collection {
 	return mongoClient.Database(cfg.MongoDBName).Collection("users")
 }
+
+// GetActivitiesColl returns the MongoDB collection of activities
+func GetActivitiesColl(mongoClient *mongo.Client, cfg *config.Config) *mongo.Collection {
+	return mongoClient.Database(cfg.MongoDBName).Collection("activities")
+}

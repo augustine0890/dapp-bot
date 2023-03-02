@@ -2,9 +2,12 @@ package discord
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 
+	"github.com/augustine0890/dapp-bot/pkg/config"
 	"github.com/bwmarrin/discordgo"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // CommandHandlerFunc represents a function that handles a Discord command
@@ -53,6 +56,14 @@ func (ch *CommandHandler) HandleCommand(s *discordgo.Session, m *discordgo.Messa
 	// Call the handler function
 	args := parts[1:]
 	handler(s, m, args)
+}
+
+func RegisterHandler(session *discordgo.Session, mongoClient *mongo.Client, cfg *config.Config, eventType interface{}, handlerFunc interface{}) {
+	session.AddHandler(func(s *discordgo.Session, e interface{}) {
+		if reflect.TypeOf(e) == reflect.TypeOf(eventType) {
+			reflect.ValueOf(handlerFunc).Call([]reflect.Value{reflect.ValueOf(s), reflect.ValueOf(e), reflect.ValueOf(mongoClient), reflect.ValueOf(cfg.MongoDBName), reflect.ValueOf("users")})
+		}
+	})
 }
 
 func HandleReady(s *discordgo.Session, event *discordgo.Ready) {

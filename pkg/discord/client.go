@@ -48,6 +48,12 @@ func NewDiscord(cfg *config.Config) (*Discord, error) {
 	// Register the command handler function
 	session.AddHandler(ch.HandleCommand)
 
+	// Register the member join/leave handler function
+	RegisterHandler(session, mongoClient, cfg, &discordgo.GuildMemberAdd{}, HandleMember)
+	RegisterHandler(session, mongoClient, cfg, &discordgo.GuildMemberRemove{}, HandleMember)
+
+	// Register additional event handlers here as needed
+
 	// Create a new Discord instance
 	d := &Discord{
 		session:       session,
@@ -58,6 +64,7 @@ func NewDiscord(cfg *config.Config) (*Discord, error) {
 
 	// Register the ready command handler function
 	// session.AddHandler(HandleReady)
+
 	// Register the message reaction handler function
 	// session.AddHandler(d.HandleReaction)
 
