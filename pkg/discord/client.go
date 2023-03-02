@@ -2,6 +2,7 @@ package discord
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/augustine0890/dapp-bot/internal/database"
 	"github.com/augustine0890/dapp-bot/pkg/config"
+	"github.com/augustine0890/dapp-bot/pkg/logging"
 	"github.com/bwmarrin/discordgo"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -69,7 +71,7 @@ func (d *Discord) Connect() error {
 		return fmt.Errorf("failed to connect to Discord: %w", err)
 	}
 
-	fmt.Println("Bot is now running. Press CTRL-C to exit.")
+	log.Println("Bot is now running. Press CTRL-C to exit.")
 
 	// Wait for CTRL-C or SIGINT/SIGTERM
 	signalChan := make(chan os.Signal, 1)
@@ -79,7 +81,7 @@ func (d *Discord) Connect() error {
 	// Cleanly close down the Discord session
 	err = d.session.Close()
 	if err != nil {
-		fmt.Println("Error closing Discord session:", err)
+		logging.Error("Error closing Discord session:", err)
 	}
 
 	return nil

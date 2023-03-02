@@ -73,7 +73,7 @@ func handleCheckPoint(s *discordgo.Session, m *discordgo.MessageCreate, args []s
 			URL: m.Author.AvatarURL(""),
 		},
 		Footer: &discordgo.MessageEmbedFooter{
-			Text:    fmt.Sprintf("Given to %s", m.Author.Username),
+			Text:    fmt.Sprintf("Given to %s#%s", m.Author.Username, m.Author.Discriminator),
 			IconURL: m.Author.AvatarURL(""),
 		},
 		Color:     0x00aaff,
@@ -289,7 +289,7 @@ func handleMyRank(s *discordgo.Session, m *discordgo.MessageCreate, args []strin
 			URL: m.Author.AvatarURL(""),
 		},
 		Footer: &discordgo.MessageEmbedFooter{
-			Text:    fmt.Sprintf("Given to %s", m.Author.Username),
+			Text:    fmt.Sprintf("Given to %s#%s", m.Author.Username, m.Author.Discriminator),
 			IconURL: m.Author.AvatarURL(""),
 		},
 		Color:     0x00aaff,

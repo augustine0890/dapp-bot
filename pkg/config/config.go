@@ -14,9 +14,14 @@ type Config struct {
 }
 
 // LoadConfig loads the application's configuration from the config file.
-func LoadConfig() (*Config, error) {
+func LoadConfig(stage string) (*Config, error) {
+	switch stage {
+	case "dev":
+		viper.SetConfigName("config.dev")
+	default:
+		viper.SetConfigName("config")
+	}
 	// viper.SetConfigFile("config.yaml")
-	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("./pkg/config/")
 	viper.SetDefault("mongo_uri", "mongodb://localhost:27017")

@@ -19,6 +19,13 @@ Quick Start
 4.  Invite the bot to your Discord server
 5.  Enjoy using the bot!
 
+- Using the `-stage` flag
+  - `go run cmd/main.go -stage="dev"`
+  - `go run cmd/main.go -stage dev`
+- Run with `go build`
+  - `go build -o bot ./cmd/main.go`
+  - Build: `./bot -stage dev` --> development stage
+
 For more detailed installation and usage instructions, refer to the [DappBot](https://discord.com/api/oauth2/authorize?client_id=1069870125425115166&permissions=8&scope=bot).
 
 **Application Structure**
