@@ -34,3 +34,12 @@ func Error(message string, err error) {
 func Fatal(message string, err error) {
 	log.Fatal().Err(err).Msg(message)
 }
+
+func Warn(message string, err ...error) {
+	// log the message and error with the fields
+	if len(err) > 0 && err[0] != nil {
+		log.Warn().Err(err[0]).Msg(message)
+	} else {
+		log.Warn().Msg(message)
+	}
+}

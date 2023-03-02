@@ -30,6 +30,12 @@ func RankCommand(cfg *config.Config, mongoClient *mongo.Client) CommandHandlerFu
 	}
 }
 
+func MyRankCommand(cfg *config.Config, mongoClient *mongo.Client) CommandHandlerFunc {
+	return func(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
+		handleMyRank(s, m, args, cfg, mongoClient)
+	}
+}
+
 // HandleCheckPoint handles the !checkpoint command, sending the user's points as an embed message
 func handleCheckPoint(s *discordgo.Session, m *discordgo.MessageCreate, args []string, cfg *config.Config, mongoClient *mongo.Client) {
 	// Retrieve the user's points from MongoDB
@@ -89,6 +95,16 @@ func handleRank(s *discordgo.Session, m *discordgo.MessageCreate, args []string,
 	// Retrieve the user's points from MongoDB
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
+
+	attendanceChannelID := cfg.AttendanceID
+	if m.ChannelID != attendanceChannelID {
+		message := fmt.Sprintf("<@%s> Please go to the <#%s> channel for Daily Attendance and Points Checking.", m.Author.ID, attendanceChannelID)
+		_, err := s.ChannelMessageSend(m.ChannelID, message)
+		if err != nil {
+			logging.Error("Error sending message", err)
+		}
+		return
+	}
 
 	usersColl := database.GetUsersColl(mongoClient, cfg)
 
@@ -181,4 +197,111 @@ func handleRank(s *discordgo.Session, m *discordgo.MessageCreate, args []string,
 		logging.Error("Error sending message to channel.", err)
 		return
 	}
+}
+
+func handleMyRank(s *discordgo.Session, m *discordgo.MessageCreate, args []string, cfg *config.Config, mongoClient *mongo.Client) {
+	// Retrieve the user's points from MongoDB
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	usersColl := database.GetUsersColl(mongoClient, cfg)
+
+	attendanceChannelID := cfg.AttendanceID
+	if m.ChannelID != attendanceChannelID {
+		message := fmt.Sprintf("<@%s> Please go to the <#%s> channel for Daily Attendance and Points Checking.", m.Author.ID, attendanceChannelID)
+		_, err := s.ChannelMessageSend(m.ChannelID, message)
+		if err != nil {
+			logging.Error("Error sending message", err)
+		}
+		return
+	}
+
+	userID := m.Author.ID
+	// define the pipeline
+	pipeline := bson.A{
+		bson.M{
+			"$match": bson.M{
+				"points": bson.M{"$exists": true},
+			},
+		},
+		bson.M{
+			"$sort": bson.M{
+				"points": -1,
+			},
+		},
+		bson.M{
+			"$group": bson.M{
+				"_id": nil,
+				"rankings": bson.M{
+					"$push": "$_id",
+				},
+			},
+		},
+		bson.M{
+			"$project": bson.M{
+				"rankIndex": bson.M{
+					"$indexOfArray": bson.A{"$rankings", userID},
+				},
+				"count": bson.M{"$size": "$rankings"},
+			},
+		},
+		bson.M{
+			"$project": bson.M{
+				"rank":  bson.M{"$add": bson.A{"$rankIndex", 1}},
+				"count": 1,
+			},
+		},
+	}
+
+	// execute the aggregation pipeline
+	cursor, err := usersColl.Aggregate(ctx, pipeline)
+	if err != nil {
+		logging.Error("Error aggregation pipeline", err)
+		return
+	}
+
+	// iterate over the results
+	var result bson.M
+	for cursor.Next(context.Background()) {
+		if err := cursor.Decode(&result); err != nil {
+			logging.Error("Error decoding", err)
+			return
+		}
+	}
+	// process the result
+	keys := []string{"rank", "count"}
+	for _, key := range keys {
+		_, ok := result[key]
+		if !ok {
+			msg := fmt.Sprintf("%s is not present in the map\n", key)
+			logging.Warn(msg)
+			return
+		}
+	}
+
+	// Create an embed massage with the user's ranking
+	embed := &discordgo.MessageEmbed{
+		Title: "Your Ranking",
+		Author: &discordgo.MessageEmbedAuthor{
+			Name: m.Author.Username,
+		},
+		Thumbnail: &discordgo.MessageEmbedThumbnail{
+			URL: m.Author.AvatarURL(""),
+		},
+		Footer: &discordgo.MessageEmbedFooter{
+			Text:    fmt.Sprintf("Given to %s", m.Author.Username),
+			IconURL: m.Author.AvatarURL(""),
+		},
+		Color:     0x00aaff,
+		Timestamp: time.Now().Format(time.RFC3339),
+		Fields: []*discordgo.MessageEmbedField{
+			{
+				Name:   fmt.Sprintf("%d out of %d", result["rank"], result["count"]),
+				Value:  "Super-Duper! 🎉",
+				Inline: true,
+			},
+		},
+	}
+	// Send the embed message as a reply to the original message
+	s.ChannelMessageSendEmbed(m.ChannelID, embed)
 }
