@@ -61,7 +61,7 @@ func (ch *CommandHandler) HandleCommand(s *discordgo.Session, m *discordgo.Messa
 func RegisterHandler(session *discordgo.Session, mongoClient *mongo.Client, cfg *config.Config, eventType interface{}, handlerFunc interface{}) {
 	session.AddHandler(func(s *discordgo.Session, e interface{}) {
 		if reflect.TypeOf(e) == reflect.TypeOf(eventType) {
-			reflect.ValueOf(handlerFunc).Call([]reflect.Value{reflect.ValueOf(s), reflect.ValueOf(e), reflect.ValueOf(mongoClient), reflect.ValueOf(cfg.MongoDBName), reflect.ValueOf("users")})
+			reflect.ValueOf(handlerFunc).Call([]reflect.Value{reflect.ValueOf(s), reflect.ValueOf(e), reflect.ValueOf(mongoClient), reflect.ValueOf(cfg)})
 		}
 	})
 }
