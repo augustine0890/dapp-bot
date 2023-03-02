@@ -1,3 +1,4 @@
 mongo_uri: "mongodb://localhost:27017/mydb"
 discord_token: "YOUR_DISCORD_BOT_TOKEN_HERE"
-mongo_db_name: "db-name"
+mongo_db_name: "db_name"
+guild_id: "guild_id" #18295782792369805440

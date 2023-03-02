@@ -17,7 +17,7 @@ func main() {
 	// Load the application configuration
 	cfg, err := config.LoadConfig(*stage)
 	if err != nil {
-		logging.Error("Failed to read config file:", err)
+		logging.Fatal("Failed to read config file", err)
 	}
 	log.Printf("Config loaded and running with %s stage.", *stage)
 
