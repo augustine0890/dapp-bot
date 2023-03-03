@@ -57,6 +57,8 @@ func NewDiscord(cfg *config.Config) (*Discord, error) {
 
 	// Register additional event handlers here as needed
 
+	session.AddHandler(HandleRemoveReaction)
+
 	// Create a new Discord instance
 	d := &Discord{
 		session:       session,
