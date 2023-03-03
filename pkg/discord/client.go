@@ -37,6 +37,9 @@ func NewDiscord(cfg *config.Config) (*Discord, error) {
 		return nil, fmt.Errorf("failed to create Discord session: %w", err)
 	}
 
+	intents := discordgo.IntentsGuildMessages | discordgo.IntentsGuildMessageReactions | discordgo.IntentsGuildMembers
+	session.Identify.Intents = intents
+
 	// Create a new CommandHandler and register commands
 	ch := NewCommandHandler()
 	ch.RegisterCommand(HandlePing, "ping")
