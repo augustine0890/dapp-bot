@@ -19,13 +19,21 @@ func HandleMember(s *discordgo.Session, e interface{}, mongoClient *mongo.Client
 	var joinedDate time.Time
 	var leave bool
 
+	targetGuild := cfg.GuildID // get the target guild ID from config
+
 	switch event := e.(type) {
 	case *discordgo.GuildMemberAdd:
+		// If the member joined another guild or is a bot, return
+		if event.GuildID != targetGuild || event.Member.User.Bot {
+			return
+		}
+		// Set the user ID, username, joined date, and leave value
 		userID = event.Member.User.ID
 		username = event.Member.User.Username
 		joinedDate = event.Member.JoinedAt
 		leave = false
 	case *discordgo.GuildMemberRemove:
+		// If the member left the guild, set the user ID, username, and leave value
 		userID = event.User.ID
 		username = event.User.Username
 		leave = true
