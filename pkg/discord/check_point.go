@@ -110,7 +110,7 @@ func handleRank(s *discordgo.Session, m *discordgo.MessageCreate, args []string,
 
 	// Find the top 10 users based on their points
 	findOptions := options.Find()
-	findOptions.SetSort(bson.D{{"points", -1}, {"updatedAt", 1}})
+	findOptions.SetSort(bson.D{{Key: "points", Value: -1}, {Key: "updatedAt", Value: 1}})
 	findOptions.SetLimit(10)
 	cursor, err := usersColl.Find(ctx, bson.M{}, findOptions)
 	if err != nil {
